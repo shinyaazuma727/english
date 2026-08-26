@@ -95,7 +95,7 @@ export function TreeIllustration({ stage, progress }: TreeIllustrationProps) {
           cy="100"
           r={ringRadius}
           fill="none"
-          stroke="var(--color-surface)"
+          stroke="var(--color-surface-alt)"
           strokeWidth="8"
         />
         <circle
@@ -113,7 +113,7 @@ export function TreeIllustration({ stage, progress }: TreeIllustrationProps) {
       </svg>
 
       <svg key={stage} className={styles.tree} viewBox="0 0 200 180" role="img" aria-label="学習の木">
-        <ellipse cx="100" cy={GROUND_Y + 4} rx="46" ry="6" fill="var(--color-surface)" />
+        <ellipse cx="100" cy={GROUND_Y + 4} rx="46" ry="6" fill="var(--color-surface-alt)" />
 
         {config.seed && <ellipse cx="100" cy={GROUND_Y - 3} rx="7" ry="5" fill="var(--color-tree-trunk)" />}
 

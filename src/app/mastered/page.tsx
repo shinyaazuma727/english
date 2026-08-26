@@ -26,6 +26,10 @@ export default function MasteredListPage() {
         <p className={styles.empty}>まだmasteredになった単語はありません</p>
       )}
 
+      {masteredWords !== null && masteredWords.length > 0 && (
+        <p className={styles.count}>{masteredWords.length}語</p>
+      )}
+
       <ul className={styles.list}>
         {masteredWords?.map((word) => (
           <li key={word.id} className={styles.item}>

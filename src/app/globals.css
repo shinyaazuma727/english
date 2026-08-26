@@ -1,21 +1,32 @@
 :root {
-  --color-background: #f6faf7;
-  --color-surface: #eef6f1;
-  --color-text: #123324;
-  --color-text-secondary: #5b7568;
+  --color-background: #f2f9f4;
+  --color-background-alt: #e3f1e8;
+  --color-surface: #ffffff;
+  --color-surface-alt: #eaf5ef;
+  --color-text: #0f2b1e;
+  --color-text-secondary: #4b6558;
   --color-border: #d3e6da;
   --color-correct: #16a34a;
-  --color-incorrect: #e64848;
+  --color-incorrect: #dc3d3d;
   --color-accent: #0e8f5e;
   --color-accent-strong: #0a6b46;
   --color-accent-soft: #d8f0e2;
   --color-tree-trunk: #8a5a3b;
   --color-tree-flower: #f4a6c1;
 
+  --shadow-sm: 0 2px 8px -4px rgba(15, 43, 30, 0.12);
+  --shadow-md: 0 10px 24px -12px rgba(15, 43, 30, 0.22);
+  --shadow-lg: 0 16px 36px -14px rgba(15, 43, 30, 0.28);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
   --japanese-font-size: 30px;
   --answer-font-size: 26px;
   --answer-line-width: 320px;
-  --answer-line-thickness: 1px;
+  --answer-line-thickness: 2px;
   --answer-line-color: #a9d3bb;
   --check-button-size: 88px;
   --result-mark-size: 56px;
@@ -35,7 +46,8 @@ body {
 }
 
 body {
-  background: var(--color-background);
+  background: linear-gradient(180deg, var(--color-background) 0%, var(--color-background-alt) 100%)
+    fixed;
   color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Sans",
     "Hiragino Kaku Gothic ProN", "Helvetica Neue", Arial, sans-serif;

@@ -15,27 +15,49 @@
   left: 20px;
   width: 44px;
   height: 44px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   color: var(--color-text-secondary);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   text-decoration: none;
+  transition: transform 0.15s ease;
+}
+
+.home:active {
+  transform: scale(0.92);
 }
 
 .timer {
   position: absolute;
-  top: 28px;
-  right: 24px;
-  min-width: 52px;
-  padding: 6px 12px;
-  border-radius: 999px;
+  top: 24px;
+  right: 20px;
+  min-width: 56px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
   background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   color: var(--color-accent-strong);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   text-align: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 24px 28px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
 }
 
 .japanese {
@@ -44,12 +66,13 @@
   align-items: center;
   justify-content: center;
   font-size: var(--japanese-font-size);
-  font-weight: 500;
+  font-weight: 700;
   text-align: center;
 }
 
 .answerWrap {
   width: var(--answer-line-width);
+  max-width: 100%;
   height: 48px;
   display: flex;
   align-items: flex-end;
@@ -90,13 +113,14 @@
   width: var(--check-button-size);
   height: var(--check-button-size);
   border-radius: 50%;
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
   color: #ffffff;
   font-size: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: var(--shadow-lg);
 }
 
 .checkButton:disabled {
@@ -168,22 +192,31 @@
 }
 
 .resultMark {
+  width: calc(var(--result-mark-size) * 1.4);
+  height: calc(var(--result-mark-size) * 1.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   font-size: var(--result-mark-size);
   line-height: 1;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .resultMark.correct {
   color: var(--color-correct);
+  background: color-mix(in srgb, var(--color-correct) 14%, transparent);
 }
 
 .resultMark.incorrect {
   color: var(--color-incorrect);
+  background: color-mix(in srgb, var(--color-incorrect) 14%, transparent);
 }
 
 .correctWord {
   font-size: var(--result-text-font-size);
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-text);
 }
 
 .empty {
@@ -199,6 +232,15 @@
 }
 
 .emptyLink {
-  color: var(--color-text);
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-accent-strong);
+  font-weight: 700;
+  text-decoration: none;
 }

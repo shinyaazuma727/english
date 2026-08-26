@@ -104,33 +104,35 @@ export default function LearningPage() {
   return (
     <main className={styles.screen}>
       <Link href="/" className={styles.home} aria-label="HOMEへ戻る">
-        ×
+        <span aria-hidden="true">×</span>
       </Link>
 
       <div className={styles.timer} aria-hidden="true">
         {(elapsedMs / 1000).toFixed(1)}s
       </div>
 
-      <div className={styles.japanese}>{currentWord?.japanese ?? ""}</div>
+      <div className={styles.card}>
+        <div className={styles.japanese}>{currentWord?.japanese ?? ""}</div>
 
-      <div className={styles.answerWrap}>
-        <input
-          ref={inputRef}
-          className={`${styles.answerInput} ${
-            phase === "result" ? (resultCorrect ? styles.correctLine : styles.incorrectLine) : ""
-          }`}
-          type="text"
-          value={inputValue}
-          onChange={(event) => setInputValue(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") handleSubmit();
-          }}
-          disabled={phase !== "answering"}
-          autoCapitalize="off"
-          autoCorrect="off"
-          autoComplete="off"
-          spellCheck={false}
-        />
+        <div className={styles.answerWrap}>
+          <input
+            ref={inputRef}
+            className={`${styles.answerInput} ${
+              phase === "result" ? (resultCorrect ? styles.correctLine : styles.incorrectLine) : ""
+            }`}
+            type="text"
+            value={inputValue}
+            onChange={(event) => setInputValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleSubmit();
+            }}
+            disabled={phase !== "answering"}
+            autoCapitalize="off"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck={false}
+          />
+        </div>
       </div>
 
       <button

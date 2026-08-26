@@ -64,9 +64,14 @@ export default function HomePage() {
 
   return (
     <main className={styles.home}>
-      <h1 className={styles.title}>KAKU</h1>
+      <header className={styles.appBar}>
+        <span className={styles.logoMark} aria-hidden="true">
+          🌱
+        </span>
+        <h1 className={styles.title}>KAKU</h1>
+      </header>
 
-      <div className={styles.treeSection}>
+      <div className={styles.treeCard}>
         <TreeIllustration stage={stage} progress={stageProgress} />
         <p className={styles.stageLabel}>{TREE_STAGE_LABELS[stage]}</p>
         {answersUntilNext !== null && (
@@ -74,9 +79,28 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className={styles.today}>
-        <div className={styles.todayValue}>{todayCount}</div>
-        <div className={styles.todayLabel}>今日書いた数</div>
+      <div className={styles.statsRow}>
+        <div className={styles.statTile}>
+          <div className={styles.todayValue}>{todayCount}</div>
+          <div className={styles.statLabel}>今日書いた数</div>
+        </div>
+
+        <div className={styles.statTile}>
+          <div
+            className={styles.pie}
+            style={{
+              background: `conic-gradient(var(--color-accent) ${masteredRatio.percent}%, var(--color-surface-alt) 0)`,
+            }}
+          >
+            <div className={styles.pieInner}>
+              <div className={styles.pieValue}>{masteredRatio.percent}%</div>
+              <div className={styles.pieSub}>
+                {masteredRatio.masteredCount}/{masteredRatio.totalCount}
+              </div>
+            </div>
+          </div>
+          <div className={styles.statLabel}>覚えた単語の割合</div>
+        </div>
       </div>
 
       <Link
@@ -87,39 +111,63 @@ export default function HomePage() {
           if (!canStart) event.preventDefault();
         }}
       >
+        <svg className={styles.buttonIcon} viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 4v16m8-8H4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+          />
+        </svg>
         学習する
       </Link>
-
-      <div className={styles.progressCard}>
-        <div
-          className={styles.pie}
-          style={{
-            background: `conic-gradient(var(--color-accent) ${masteredRatio.percent}%, var(--color-surface) 0)`,
-          }}
-        >
-          <div className={styles.pieInner}>
-            <div className={styles.pieValue}>{masteredRatio.percent}%</div>
-            <div className={styles.pieSub}>
-              {masteredRatio.masteredCount} / {masteredRatio.totalCount}
-            </div>
-          </div>
-        </div>
-        <div className={styles.progressLabel}>覚えた単語の割合</div>
-      </div>
 
       <p className={styles.total}>累計 {totalAnswerCount.toLocaleString()}回</p>
 
       <div className={styles.secondaryActions}>
         <button type="button" className={styles.secondaryButton} onClick={handleImportClick}>
-          CSVインポート
+          <svg className={styles.secondaryIcon} viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 15V4m0 0-4 4m4-4 4 4M5 16v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>CSVインポート</span>
         </button>
 
         <Link href="/mastered" className={styles.secondaryButton}>
-          MASTERED LIST{masteredRatio.masteredCount > 0 ? `（${masteredRatio.masteredCount}）` : ""}
+          <svg className={styles.secondaryIcon} viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="m5 13 4 4L19 7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>
+            MASTERED LIST
+            {masteredRatio.masteredCount > 0 ? `（${masteredRatio.masteredCount}）` : ""}
+          </span>
         </Link>
 
         <Link href="/stats" className={styles.secondaryButton}>
-          統計
+          <svg className={styles.secondaryIcon} viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 19V9m7 10V5m7 14v-7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span>統計</span>
         </Link>
       </div>
 
