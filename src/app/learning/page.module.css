@@ -1,0 +1,129 @@
+.screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+  gap: var(--learning-gap);
+}
+
+.home {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.japanese {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--japanese-font-size);
+  font-weight: 500;
+  text-align: center;
+}
+
+.answerWrap {
+  width: var(--answer-line-width);
+  height: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.answerInput {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  color: var(--color-text);
+  font-size: var(--answer-font-size);
+  border-bottom: var(--answer-line-thickness) solid var(--answer-line-color);
+  border-radius: 0;
+  padding: 0 0 6px;
+  caret-color: var(--color-text);
+}
+
+.answerInput:disabled {
+  color: var(--color-text);
+  opacity: 1;
+}
+
+.checkButton {
+  width: var(--check-button-size);
+  height: var(--check-button-size);
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #ffffff;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.checkButton:disabled {
+  opacity: 0.35;
+}
+
+.resultArea {
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  opacity: 0;
+}
+
+.resultArea.visible {
+  opacity: 1;
+}
+
+.resultMark {
+  font-size: var(--result-mark-size);
+  line-height: 1;
+  font-weight: 600;
+}
+
+.resultMark.correct {
+  color: var(--color-correct);
+}
+
+.resultMark.incorrect {
+  color: var(--color-incorrect);
+}
+
+.correctWord {
+  font-size: var(--result-text-font-size);
+  color: var(--color-text-secondary);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  gap: 20px;
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.emptyLink {
+  color: var(--color-text);
+  font-weight: 500;
+}
