@@ -1,17 +1,22 @@
 :root {
-  --color-background: #ffffff;
-  --color-text: #1d1d1f;
-  --color-text-secondary: #86868b;
-  --color-border: #d2d2d7;
-  --color-correct: #34c759;
-  --color-incorrect: #ff3b30;
-  --color-accent: #1d1d1f;
+  --color-background: #f6faf7;
+  --color-surface: #eef6f1;
+  --color-text: #123324;
+  --color-text-secondary: #5b7568;
+  --color-border: #d3e6da;
+  --color-correct: #16a34a;
+  --color-incorrect: #e64848;
+  --color-accent: #0e8f5e;
+  --color-accent-strong: #0a6b46;
+  --color-accent-soft: #d8f0e2;
+  --color-tree-trunk: #8a5a3b;
+  --color-tree-flower: #f4a6c1;
 
   --japanese-font-size: 30px;
   --answer-font-size: 26px;
   --answer-line-width: 320px;
   --answer-line-thickness: 1px;
-  --answer-line-color: #c7c7cc;
+  --answer-line-color: #a9d3bb;
   --check-button-size: 88px;
   --result-mark-size: 56px;
   --result-text-font-size: 20px;

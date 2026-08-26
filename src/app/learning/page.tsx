@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { loadWords, saveWords } from "@/lib/storage";
+import { appendHistoryRecord, loadWords, recordWrittenAnswer, saveWords } from "@/lib/storage";
 import { pickNextWord } from "@/lib/pool";
 import { applyAnswerResult } from "@/lib/judge";
-import { isCorrectAnswer } from "@/lib/answer";
+import { isCorrectAnswer, normalizeAnswer } from "@/lib/answer";
 import { speakEnglish } from "@/lib/speech";
 import { NEXT_DELAY_MS } from "@/lib/constants";
 import type { Word } from "@/types/word";
@@ -20,8 +20,11 @@ export default function LearningPage() {
   const [inputValue, setInputValue] = useState("");
   const [phase, setPhase] = useState<Phase>("answering");
   const [resultCorrect, setResultCorrect] = useState<boolean | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [answerCount, setAnswerCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startTimeRef = useRef(0);
 
   useEffect(() => {
     const initial = loadWords();
@@ -42,17 +45,37 @@ export default function LearningPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (phase !== "answering" || !currentWord) return;
+
+    startTimeRef.current = Date.now();
+    setElapsedMs(0);
+    const intervalId = setInterval(() => {
+      setElapsedMs(Date.now() - startTimeRef.current);
+    }, 100);
+
+    return () => clearInterval(intervalId);
+  }, [currentWord, phase]);
+
   const handleSubmit = useCallback(() => {
     if (phase !== "answering" || !currentWord) return;
 
     const correct = isCorrectAnswer(inputValue, currentWord.english);
+    const takenMs = Date.now() - startTimeRef.current;
     const updatedWord = applyAnswerResult(currentWord, correct);
     const nextWords = words.map((w) => (w.id === updatedWord.id ? updatedWord : w));
 
     setWords(nextWords);
     saveWords(nextWords);
+    appendHistoryRecord({ correct, elapsedMs: takenMs, timestamp: Date.now() });
+    if (normalizeAnswer(inputValue).length > 0) {
+      // Blank submissions aren't "writing" — Phase2 tree/daily totals exclude them.
+      recordWrittenAnswer();
+    }
     setResultCorrect(correct);
+    setElapsedMs(takenMs);
     setPhase("result");
+    setAnswerCount((count) => count + 1);
     speakEnglish(currentWord.english);
 
     timeoutRef.current = setTimeout(() => {
@@ -84,12 +107,18 @@ export default function LearningPage() {
         ×
       </Link>
 
+      <div className={styles.timer} aria-hidden="true">
+        {(elapsedMs / 1000).toFixed(1)}s
+      </div>
+
       <div className={styles.japanese}>{currentWord?.japanese ?? ""}</div>
 
       <div className={styles.answerWrap}>
         <input
           ref={inputRef}
-          className={styles.answerInput}
+          className={`${styles.answerInput} ${
+            phase === "result" ? (resultCorrect ? styles.correctLine : styles.incorrectLine) : ""
+          }`}
           type="text"
           value={inputValue}
           onChange={(event) => setInputValue(event.target.value)}
@@ -111,7 +140,9 @@ export default function LearningPage() {
         disabled={phase !== "answering"}
         aria-label="回答する"
       >
-        ✓
+        <span key={answerCount} className={styles.checkIcon}>
+          ✓
+        </span>
       </button>
 
       <div
@@ -119,7 +150,7 @@ export default function LearningPage() {
         aria-live="polite"
       >
         {currentWord && (
-          <>
+          <div key={`${currentWord.id}-${answerCount}`} className={styles.resultContent}>
             <div
               className={`${styles.resultMark} ${
                 resultCorrect ? styles.correct : styles.incorrect
@@ -128,7 +159,7 @@ export default function LearningPage() {
               {resultCorrect ? "○" : "×"}
             </div>
             <div className={styles.correctWord}>{currentWord.english}</div>
-          </>
+          </div>
         )}
       </div>
     </main>

@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Apple Pencilで英単語を手書きしながら覚える英語学習アプリ",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#ffffff",
+    background_color: "#f6faf7",
+    theme_color: "#0e8f5e",
     icons: [
       {
         src: "/icon-192.png",

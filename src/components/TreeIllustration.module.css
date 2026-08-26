@@ -1,0 +1,35 @@
+.wrap {
+  position: relative;
+  width: 176px;
+  height: 176px;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ring circle:last-child {
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.tree {
+  position: absolute;
+  inset: 18px;
+  width: calc(100% - 36px);
+  height: calc(100% - 36px);
+  animation: treeIn 0.5s ease;
+}
+
+@keyframes treeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -34,10 +34,10 @@ function chunk(type, data) {
   return Buffer.concat([lenBuf, typeBuf, data, crcBuf]);
 }
 
-// Solid rounded-square-ish flat icon: near-black background, thin white
+// Solid rounded-square-ish flat icon: green accent background, thin white
 // horizontal line motif (echoes the KAKU answer-line UI), no external assets.
 function buildIcon(size) {
-  const bg = [29, 29, 31]; // matches --color-text
+  const bg = [10, 107, 70]; // matches --color-accent-strong
   const line = [255, 255, 255];
   const lineY0 = Math.round(size * 0.46);
   const lineY1 = Math.round(size * 0.54);

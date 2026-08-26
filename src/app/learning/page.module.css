@@ -23,6 +23,21 @@
   text-decoration: none;
 }
 
+.timer {
+  position: absolute;
+  top: 28px;
+  right: 24px;
+  min-width: 52px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-accent-strong);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
 .japanese {
   height: 64px;
   display: flex;
@@ -61,6 +76,16 @@
   opacity: 1;
 }
 
+.correctLine {
+  border-bottom-color: var(--color-correct);
+  transition: border-bottom-color 0.2s ease;
+}
+
+.incorrectLine {
+  border-bottom-color: var(--color-incorrect);
+  transition: border-bottom-color 0.2s ease;
+}
+
 .checkButton {
   width: var(--check-button-size);
   height: var(--check-button-size);
@@ -78,6 +103,30 @@
   opacity: 0.35;
 }
 
+.checkButton:active {
+  transform: scale(0.94);
+}
+
+.checkIcon {
+  display: inline-block;
+  animation: checkPop 0.4s ease;
+}
+
+@keyframes checkPop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.75);
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .resultArea {
   height: 96px;
   display: flex;
@@ -90,6 +139,32 @@
 
 .resultArea.visible {
   opacity: 1;
+}
+
+.resultContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.resultArea.visible .resultContent {
+  animation: resultPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes resultPop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .resultMark {
