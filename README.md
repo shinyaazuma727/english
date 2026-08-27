@@ -63,9 +63,18 @@ prevent,防ぐ
 accept,受け入れる
 ```
 
+3列目に絵文字を1つ入れると、LEARNING画面の問題カードにイラストとして表示されます（省略可）。
+
+```csv
+English,Japanese,Emoji
+apple,りんご,🍎
+prevent,防ぐ
+```
+
 - UTF-8 / UTF-8 BOM、CRLF / LF / CR に対応しています。
 - ヘッダー行・空行はスキップされます。
 - 列が揃っていない不正な行はスキップされ、有効な行のみ登録されます。
+- 3列目（Emoji）が無い行・空の行はイラストなしで登録されます（学習・判定には影響しません）。
 - 既存データがある状態で再インポートすると、**学習の進捗を含めて完全に上書き**されます（確認ダイアログあり）。
 
 ## データ保存について
@@ -107,6 +116,7 @@ HOMEの木は「累計で何回書いたか」（`kaku_learning_stats` の `tota
 LEARNING画面の主要な見た目の数値は `src/app/globals.css` のCSS変数に集約しています。ロジックを変更せずに調整できます。
 
 ```css
+--emoji-size
 --japanese-font-size
 --answer-font-size
 --answer-line-width

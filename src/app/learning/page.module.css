@@ -60,6 +60,15 @@
   box-shadow: var(--shadow-md);
 }
 
+.emoji {
+  height: var(--emoji-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--emoji-size);
+  line-height: 1;
+}
+
 .japanese {
   height: 64px;
   display: flex;

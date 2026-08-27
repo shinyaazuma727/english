@@ -32,7 +32,7 @@ export function parseCsv(text: string): Word[] {
     const line = rawLine.trim();
     if (!line) continue;
 
-    const [english, japanese] = parseCsvLine(line);
+    const [english, japanese, emoji] = parseCsvLine(line);
     if (!english || !japanese) continue;
     if (english.toLowerCase() === "english" && japanese.toLowerCase() === "japanese") continue;
 
@@ -42,6 +42,7 @@ export function parseCsv(text: string): Word[] {
       japanese,
       status: "learning",
       correctCount: 0,
+      ...(emoji ? { emoji } : {}),
     });
   }
 

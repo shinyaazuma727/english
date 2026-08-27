@@ -159,6 +159,9 @@ export default function LearningPage() {
       </div>
 
       <div className={styles.card}>
+        <div className={styles.emoji} aria-hidden="true">
+          {currentWord?.emoji ?? ""}
+        </div>
         <div className={styles.japanese}>{currentWord?.japanese ?? ""}</div>
 
         <div className={styles.answerWrap}>
