@@ -1,4 +1,7 @@
 export const NEXT_DELAY_MS = 1000;
+// Per-question time limit: forces an incorrect result if the user hasn't
+// submitted within this window, so a stuck word doesn't stall the learning cycle.
+export const ANSWER_TIMEOUT_MS = 15_000;
 export const MASTERED_CORRECT_COUNT = 3;
 export const MASTERED_REVIEW_RATIO = 0.25;
 export const STORAGE_KEY = "kaku_words";

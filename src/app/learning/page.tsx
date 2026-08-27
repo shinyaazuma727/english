@@ -7,11 +7,18 @@ import { pickNextWord } from "@/lib/pool";
 import { applyAnswerResult } from "@/lib/judge";
 import { isCorrectAnswer, normalizeAnswer } from "@/lib/answer";
 import { speakEnglish } from "@/lib/speech";
-import { NEXT_DELAY_MS } from "@/lib/constants";
+import { ANSWER_TIMEOUT_MS, NEXT_DELAY_MS } from "@/lib/constants";
 import type { Word } from "@/types/word";
 import styles from "./page.module.css";
 
 type Phase = "answering" | "result";
+
+function formatRemaining(ms: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
 
 export default function LearningPage() {
   const [loaded, setLoaded] = useState(false);
@@ -20,11 +27,17 @@ export default function LearningPage() {
   const [inputValue, setInputValue] = useState("");
   const [phase, setPhase] = useState<Phase>("answering");
   const [resultCorrect, setResultCorrect] = useState<boolean | null>(null);
-  const [elapsedMs, setElapsedMs] = useState(0);
+  const [remainingMs, setRemainingMs] = useState(ANSWER_TIMEOUT_MS);
   const [answerCount, setAnswerCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const advanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const deadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startTimeRef = useRef(0);
+  const inputValueRef = useRef("");
+  // Guards against the ✓ button and the 15s timeout both resolving the same
+  // question (e.g. a click landing right as the deadline timer fires).
+  const resolvedRef = useRef(false);
 
   useEffect(() => {
     const initial = loadWords();
@@ -41,50 +54,84 @@ export default function LearningPage() {
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (advanceRef.current) clearTimeout(advanceRef.current);
     };
   }, []);
 
+  // Resolves the current question exactly once, whether triggered by the ✓
+  // button or by the 15s timeout. `correct` is decided by the caller —
+  // timeout always passes false.
+  const resolve = useCallback(
+    (correct: boolean) => {
+      if (resolvedRef.current || phase !== "answering" || !currentWord) return;
+      resolvedRef.current = true;
+
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current);
+        tickIntervalRef.current = null;
+      }
+      if (deadlineRef.current) {
+        clearTimeout(deadlineRef.current);
+        deadlineRef.current = null;
+      }
+
+      const takenMs = Date.now() - startTimeRef.current;
+      const updatedWord = applyAnswerResult(currentWord, correct);
+      const nextWords = words.map((w) => (w.id === updatedWord.id ? updatedWord : w));
+
+      setWords(nextWords);
+      saveWords(nextWords);
+      appendHistoryRecord({ correct, elapsedMs: takenMs, timestamp: Date.now() });
+      if (normalizeAnswer(inputValueRef.current).length > 0) {
+        // Blank submissions aren't "writing" — Phase2 tree/daily totals exclude them.
+        recordWrittenAnswer();
+      }
+      setResultCorrect(correct);
+      setPhase("result");
+      setAnswerCount((count) => count + 1);
+      speakEnglish(currentWord.english);
+
+      advanceRef.current = setTimeout(() => {
+        setCurrentWord(pickNextWord(nextWords, currentWord.id));
+        setInputValue("");
+        inputValueRef.current = "";
+        setResultCorrect(null);
+        setPhase("answering");
+      }, NEXT_DELAY_MS);
+    },
+    [phase, currentWord, words]
+  );
+
+  // Starts (and fully resets) the 15s answer-limit timer whenever a new
+  // question becomes answerable. Torn down on every phase/word change so a
+  // stale timer can never fire into the next question.
   useEffect(() => {
     if (phase !== "answering" || !currentWord) return;
 
+    resolvedRef.current = false;
     startTimeRef.current = Date.now();
-    setElapsedMs(0);
-    const intervalId = setInterval(() => {
-      setElapsedMs(Date.now() - startTimeRef.current);
+    setRemainingMs(ANSWER_TIMEOUT_MS);
+
+    tickIntervalRef.current = setInterval(() => {
+      setRemainingMs(Math.max(0, ANSWER_TIMEOUT_MS - (Date.now() - startTimeRef.current)));
     }, 100);
 
-    return () => clearInterval(intervalId);
-  }, [currentWord, phase]);
+    deadlineRef.current = setTimeout(() => {
+      resolve(false);
+    }, ANSWER_TIMEOUT_MS);
+
+    return () => {
+      if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
+      if (deadlineRef.current) clearTimeout(deadlineRef.current);
+      tickIntervalRef.current = null;
+      deadlineRef.current = null;
+    };
+  }, [currentWord, phase, resolve]);
 
   const handleSubmit = useCallback(() => {
     if (phase !== "answering" || !currentWord) return;
-
-    const correct = isCorrectAnswer(inputValue, currentWord.english);
-    const takenMs = Date.now() - startTimeRef.current;
-    const updatedWord = applyAnswerResult(currentWord, correct);
-    const nextWords = words.map((w) => (w.id === updatedWord.id ? updatedWord : w));
-
-    setWords(nextWords);
-    saveWords(nextWords);
-    appendHistoryRecord({ correct, elapsedMs: takenMs, timestamp: Date.now() });
-    if (normalizeAnswer(inputValue).length > 0) {
-      // Blank submissions aren't "writing" — Phase2 tree/daily totals exclude them.
-      recordWrittenAnswer();
-    }
-    setResultCorrect(correct);
-    setElapsedMs(takenMs);
-    setPhase("result");
-    setAnswerCount((count) => count + 1);
-    speakEnglish(currentWord.english);
-
-    timeoutRef.current = setTimeout(() => {
-      setCurrentWord(pickNextWord(nextWords, currentWord.id));
-      setInputValue("");
-      setResultCorrect(null);
-      setPhase("answering");
-    }, NEXT_DELAY_MS);
-  }, [phase, currentWord, inputValue, words]);
+    resolve(isCorrectAnswer(inputValue, currentWord.english));
+  }, [phase, currentWord, inputValue, resolve]);
 
   if (!loaded) {
     return <main className={styles.screen} />;
@@ -108,7 +155,7 @@ export default function LearningPage() {
       </Link>
 
       <div className={styles.timer} aria-hidden="true">
-        {(elapsedMs / 1000).toFixed(1)}s
+        {formatRemaining(remainingMs)}
       </div>
 
       <div className={styles.card}>
@@ -122,7 +169,11 @@ export default function LearningPage() {
             }`}
             type="text"
             value={inputValue}
-            onChange={(event) => setInputValue(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setInputValue(value);
+              inputValueRef.current = value;
+            }}
             onKeyDown={(event) => {
               if (event.key === "Enter") handleSubmit();
             }}
