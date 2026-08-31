@@ -7,7 +7,7 @@ import { appendHistoryRecord, loadWords, recordWrittenAnswer, saveWords } from "
 import { pickNextWord } from "@/lib/pool";
 import { applyAnswerResult } from "@/lib/judge";
 import { isCorrectAnswer, isCorrectAnswerLoose, normalizeAnswer } from "@/lib/answer";
-import { isSpeechRecognitionSupported, listenForSpokenAnswer, speakEnglish } from "@/lib/speech";
+import { speakEnglish } from "@/lib/speech";
 import { ANSWER_TIMEOUT_MS, NEXT_DELAY_MS, getLevelConfig } from "@/lib/constants";
 import type { Word } from "@/types/word";
 import styles from "./page.module.css";
@@ -34,54 +34,15 @@ export default function LearningPage() {
   const [resultCorrect, setResultCorrect] = useState<boolean | null>(null);
   const [remainingMs, setRemainingMs] = useState(ANSWER_TIMEOUT_MS);
   const [answerCount, setAnswerCount] = useState(0);
-  const [micSupported, setMicSupported] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const advanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const deadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startTimeRef = useRef(0);
   const inputValueRef = useRef("");
-  const stopListeningRef = useRef<(() => void) | null>(null);
   // Guards against the ✓ button and the 15s timeout both resolving the same
   // question (e.g. a click landing right as the deadline timer fires).
   const resolvedRef = useRef(false);
-
-  useEffect(() => {
-    setMicSupported(isSpeechRecognitionSupported());
-  }, []);
-
-  const stopListening = useCallback(() => {
-    stopListeningRef.current?.();
-    stopListeningRef.current = null;
-    setIsListening(false);
-  }, []);
-
-  useEffect(() => {
-    return () => stopListening();
-  }, [stopListening]);
-
-  const handleMicClick = useCallback(() => {
-    if (phase !== "answering" || isListening) return;
-
-    const stop = listenForSpokenAnswer({
-      onResult: (transcript) => {
-        setInputValue(transcript);
-        inputValueRef.current = transcript;
-      },
-      onError: () => {
-        stopListeningRef.current = null;
-        setIsListening(false);
-      },
-      onEnd: () => {
-        stopListeningRef.current = null;
-        setIsListening(false);
-      },
-    });
-    if (!stop) return;
-    stopListeningRef.current = stop;
-    setIsListening(true);
-  }, [phase, isListening]);
 
   useEffect(() => {
     const initial = loadWords(levelId);
@@ -109,7 +70,6 @@ export default function LearningPage() {
     (correct: boolean) => {
       if (resolvedRef.current || phase !== "answering" || !currentWord) return;
       resolvedRef.current = true;
-      stopListening();
 
       if (tickIntervalRef.current) {
         clearInterval(tickIntervalRef.current);
@@ -144,7 +104,7 @@ export default function LearningPage() {
         setPhase("answering");
       }, NEXT_DELAY_MS);
     },
-    [phase, currentWord, words, levelId, stopListening]
+    [phase, currentWord, words, levelId]
   );
 
   // Starts (and fully resets) the 15s answer-limit timer whenever a new
@@ -209,12 +169,14 @@ export default function LearningPage() {
         </div>
         <div className={styles.japanese}>{currentWord?.japanese ?? ""}</div>
 
-        <div className={styles.answerWrap}>
+        <div
+          className={`${styles.answerWrap} ${
+            phase === "result" ? (resultCorrect ? styles.correctBox : styles.incorrectBox) : ""
+          }`}
+        >
           <input
             ref={inputRef}
-            className={`${styles.answerInput} ${
-              phase === "result" ? (resultCorrect ? styles.correctLine : styles.incorrectLine) : ""
-            }`}
+            className={styles.answerInput}
             type="text"
             value={inputValue}
             onChange={(event) => {
@@ -226,6 +188,7 @@ export default function LearningPage() {
               if (event.key === "Enter") handleSubmit();
             }}
             disabled={phase !== "answering"}
+            placeholder="ここに書く"
             autoCapitalize="off"
             autoCorrect="off"
             autoComplete="off"
@@ -234,48 +197,17 @@ export default function LearningPage() {
         </div>
       </div>
 
-      <div className={styles.actionRow}>
-        {micSupported && (
-          <button
-            type="button"
-            className={`${styles.micButton} ${isListening ? styles.micListening : ""}`}
-            onClick={handleMicClick}
-            disabled={phase !== "answering"}
-            aria-label={isListening ? "音声を聞き取り中" : "音声で答える"}
-          >
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-              <path
-                d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        )}
-
-        <button
-          type="button"
-          className={styles.checkButton}
-          onClick={handleSubmit}
-          disabled={phase !== "answering"}
-          aria-label="回答する"
-        >
-          <span key={answerCount} className={styles.checkIcon}>
-            ✓
-          </span>
-        </button>
-      </div>
+      <button
+        type="button"
+        className={styles.checkButton}
+        onClick={handleSubmit}
+        disabled={phase !== "answering"}
+        aria-label="回答する"
+      >
+        <span key={answerCount} className={styles.checkIcon}>
+          ✓
+        </span>
+      </button>
 
       <div
         className={`${styles.resultArea} ${phase === "result" ? styles.visible : ""}`}
