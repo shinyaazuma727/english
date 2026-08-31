@@ -138,6 +138,12 @@ export default function LearningPage() {
     resolve(judge(inputValue, currentWord.english));
   }, [phase, currentWord, inputValue, resolve, judge]);
 
+  // "わからない" always resolves as incorrect, regardless of anything typed
+  // so far — same outcome as the 15s timeout, just user-initiated.
+  const handleSkip = useCallback(() => {
+    resolve(false);
+  }, [resolve]);
+
   if (!loaded) {
     return <main className={styles.screen} />;
   }
@@ -155,10 +161,6 @@ export default function LearningPage() {
 
   return (
     <main className={styles.screen}>
-      <Link href={`/${levelId}`} className={styles.home} aria-label="HOMEへ戻る">
-        <span aria-hidden="true">×</span>
-      </Link>
-
       <div className={styles.timer} aria-hidden="true">
         {formatRemaining(remainingMs)}
       </div>
@@ -197,17 +199,33 @@ export default function LearningPage() {
         </div>
       </div>
 
-      <button
-        type="button"
-        className={styles.checkButton}
-        onClick={handleSubmit}
-        disabled={phase !== "answering"}
-        aria-label="回答する"
-      >
-        <span key={answerCount} className={styles.checkIcon}>
-          ✓
-        </span>
-      </button>
+      <div className={styles.actionRow}>
+        <Link href={`/${levelId}`} className={styles.sideButton} aria-label="TOPへ戻る">
+          TOP
+        </Link>
+
+        <button
+          type="button"
+          className={styles.checkButton}
+          onClick={handleSubmit}
+          disabled={phase !== "answering"}
+          aria-label="回答する"
+        >
+          <span key={answerCount} className={styles.checkIcon}>
+            ✓
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className={styles.sideButton}
+          onClick={handleSkip}
+          disabled={phase !== "answering"}
+          aria-label="わからない（次の問題へ）"
+        >
+          わからない
+        </button>
+      </div>
 
       <div
         className={`${styles.resultArea} ${phase === "result" ? styles.visible : ""}`}
