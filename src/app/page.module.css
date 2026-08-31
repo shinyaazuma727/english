@@ -27,8 +27,15 @@
   color: var(--color-accent-strong);
 }
 
+.appDescription {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent-strong);
+}
+
 .subtitle {
-  margin: 0 0 24px;
+  margin: 4px 0 24px;
   font-size: 15px;
   color: var(--color-text-secondary);
 }

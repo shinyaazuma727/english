@@ -3,6 +3,7 @@ import type { AnswerRecord } from "@/types/history";
 import type { LearningStats } from "@/types/stats";
 import {
   MAX_HISTORY_LENGTH,
+  getLevelConfig,
   historyStorageKey,
   learningStatsStorageKey,
   wordsStorageKey,
@@ -12,15 +13,20 @@ import { getLocalDateString } from "./date";
 const EMPTY_STATS: LearningStats = { totalAnswerCount: 0, dailyRecords: {} };
 
 // All storage below is namespaced per level (準2級/2級/...) so their word
-// data, history, and stats never mix. A level with no imported CSV yet has
-// no key in localStorage and simply reads back as empty.
+// data, history, and stats never mix. A level that has never been opened
+// before is seeded with its starter word bank (see LevelConfig.defaultWords)
+// so learning can start immediately; from then on, CSV import replaces it.
 
 export function loadWords(levelId: string): Word[] {
   if (typeof window === "undefined") return [];
 
   try {
     const raw = window.localStorage.getItem(wordsStorageKey(levelId));
-    if (raw === null) return [];
+    if (raw === null) {
+      const defaults = getLevelConfig(levelId)?.defaultWords ?? [];
+      if (defaults.length > 0) saveWords(levelId, defaults);
+      return defaults;
+    }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as Word[]) : [];
   } catch {

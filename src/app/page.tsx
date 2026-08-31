@@ -12,6 +12,7 @@ export default function LevelPickerPage() {
         <h1 className={styles.title}>KAKU</h1>
       </header>
 
+      <p className={styles.appDescription}>手書きで覚える、英単語学習アプリ</p>
       <p className={styles.subtitle}>級を選んでください</p>
 
       <div className={styles.levelList}>
