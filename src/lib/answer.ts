@@ -23,3 +23,19 @@ export function isCorrectAnswer(input: string, correctEnglish: string): boolean 
   if (normalizedInput === normalizedCorrect) return true;
   return isFirstLetterCapitalizationOnlyMismatch(normalizedInput, normalizedCorrect);
 }
+
+// Phrase/sentence-level content (LevelConfig.judgeMode "loose") needs a much
+// more tolerant comparison than single words: both speech-to-text output and
+// typed full sentences vary in case, punctuation, and spacing in ways that
+// carry no real difference in meaning, so those are ignored entirely here.
+function normalizeForLooseMatch(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[.,!?;:'"’”()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function isCorrectAnswerLoose(input: string, correctEnglish: string): boolean {
+  return normalizeForLooseMatch(input) === normalizeForLooseMatch(correctEnglish);
+}

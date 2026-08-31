@@ -1,6 +1,7 @@
 import type { Word } from "@/types/word";
 import { DEFAULT_WORDS_PRE2 } from "./defaultWordsPre2";
 import { DEFAULT_WORDS_GRADE2 } from "./defaultWordsGrade2";
+import { DEFAULT_WORDS_DAILY } from "./defaultWordsDaily";
 
 export const NEXT_DELAY_MS = 1000;
 // Per-question time limit: forces an incorrect result if the user hasn't
@@ -24,11 +25,35 @@ export type LevelConfig = {
   // Seeded into a level's word bank the first time it's opened (before any
   // CSV import). A starter set, not the full official Eiken word list.
   defaultWords: Word[];
+  // "strict" (default): near-exact match, single words/short phrases.
+  // "loose": case/punctuation-insensitive — for phrase/sentence content
+  // where that variation (especially from speech-to-text) carries no real
+  // difference. See answer.ts.
+  judgeMode: "strict" | "loose";
 };
 
 export const LEVELS: LevelConfig[] = [
-  { id: "pre2", label: "準2級", materialLabel: "英検準2級", defaultWords: DEFAULT_WORDS_PRE2 },
-  { id: "grade2", label: "2級", materialLabel: "英検2級", defaultWords: DEFAULT_WORDS_GRADE2 },
+  {
+    id: "pre2",
+    label: "準2級",
+    materialLabel: "英検準2級",
+    defaultWords: DEFAULT_WORDS_PRE2,
+    judgeMode: "strict",
+  },
+  {
+    id: "grade2",
+    label: "2級",
+    materialLabel: "英検2級",
+    defaultWords: DEFAULT_WORDS_GRADE2,
+    judgeMode: "strict",
+  },
+  {
+    id: "daily",
+    label: "日常会話",
+    materialLabel: "日常会話",
+    defaultWords: DEFAULT_WORDS_DAILY,
+    judgeMode: "loose",
+  },
 ];
 
 export function getLevelConfig(levelId: string): LevelConfig | undefined {

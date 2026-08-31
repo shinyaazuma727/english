@@ -8,14 +8,39 @@ function splitLines(text: string): string[] {
   return text.split(/\r\n|\r|\n/);
 }
 
+// Quote-aware split: sentence-level content (日常会話 etc.) routinely
+// contains commas inside a field (e.g. "Can I have some water, please?"),
+// so a plain line.split(",") would corrupt those rows. Wrap such a field in
+// "double quotes" in the CSV; "" inside a quoted field escapes to a literal ".
 function parseCsvLine(line: string): string[] {
-  return line.split(",").map((cell) => {
-    const trimmed = cell.trim();
-    if (trimmed.length >= 2 && trimmed.startsWith('"') && trimmed.endsWith('"')) {
-      return trimmed.slice(1, -1).trim();
+  const cells: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (inQuotes) {
+      if (char === '"') {
+        if (line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += char;
+      }
+    } else if (char === '"' && current.trim() === "") {
+      inQuotes = true;
+    } else if (char === ",") {
+      cells.push(current.trim());
+      current = "";
+    } else {
+      current += char;
     }
-    return trimmed;
-  });
+  }
+  cells.push(current.trim());
+  return cells;
 }
 
 let idCounter = 0;
