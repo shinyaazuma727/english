@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { appendHistoryRecord, loadWords, recordWrittenAnswer, saveWords } from "@/lib/storage";
 import { pickNextWord } from "@/lib/pool";
 import { applyAnswerResult } from "@/lib/judge";
@@ -21,6 +22,8 @@ function formatRemaining(ms: number): string {
 }
 
 export default function LearningPage() {
+  const params = useParams<{ level: string }>();
+  const levelId = params.level;
   const [loaded, setLoaded] = useState(false);
   const [words, setWords] = useState<Word[]>([]);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
@@ -40,11 +43,11 @@ export default function LearningPage() {
   const resolvedRef = useRef(false);
 
   useEffect(() => {
-    const initial = loadWords();
+    const initial = loadWords(levelId);
     setWords(initial);
     setCurrentWord(pickNextWord(initial, null));
     setLoaded(true);
-  }, []);
+  }, [levelId]);
 
   useEffect(() => {
     if (phase === "answering") {
@@ -80,11 +83,11 @@ export default function LearningPage() {
       const nextWords = words.map((w) => (w.id === updatedWord.id ? updatedWord : w));
 
       setWords(nextWords);
-      saveWords(nextWords);
-      appendHistoryRecord({ correct, elapsedMs: takenMs, timestamp: Date.now() });
+      saveWords(levelId, nextWords);
+      appendHistoryRecord(levelId, { correct, elapsedMs: takenMs, timestamp: Date.now() });
       if (normalizeAnswer(inputValueRef.current).length > 0) {
         // Blank submissions aren't "writing" — Phase2 tree/daily totals exclude them.
-        recordWrittenAnswer();
+        recordWrittenAnswer(levelId);
       }
       setResultCorrect(correct);
       setPhase("result");
@@ -99,7 +102,7 @@ export default function LearningPage() {
         setPhase("answering");
       }, NEXT_DELAY_MS);
     },
-    [phase, currentWord, words]
+    [phase, currentWord, words, levelId]
   );
 
   // Starts (and fully resets) the 15s answer-limit timer whenever a new
@@ -141,7 +144,7 @@ export default function LearningPage() {
     return (
       <main className={styles.empty}>
         <p>単語データがありません</p>
-        <Link href="/" className={styles.emptyLink}>
+        <Link href={`/${levelId}`} className={styles.emptyLink}>
           HOMEへ戻る
         </Link>
       </main>
@@ -150,7 +153,7 @@ export default function LearningPage() {
 
   return (
     <main className={styles.screen}>
-      <Link href="/" className={styles.home} aria-label="HOMEへ戻る">
+      <Link href={`/${levelId}`} className={styles.home} aria-label="HOMEへ戻る">
         <span aria-hidden="true">×</span>
       </Link>
 

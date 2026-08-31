@@ -2,27 +2,25 @@ import type { Word } from "@/types/word";
 import type { AnswerRecord } from "@/types/history";
 import type { LearningStats } from "@/types/stats";
 import {
-  HISTORY_STORAGE_KEY,
-  LEARNING_STATS_STORAGE_KEY,
   MAX_HISTORY_LENGTH,
-  STORAGE_KEY,
+  historyStorageKey,
+  learningStatsStorageKey,
+  wordsStorageKey,
 } from "./constants";
-import { DEFAULT_WORDS } from "./defaultWords";
 import { getLocalDateString } from "./date";
 
 const EMPTY_STATS: LearningStats = { totalAnswerCount: 0, dailyRecords: {} };
 
-export function loadWords(): Word[] {
+// All storage below is namespaced per level (準2級/2級/...) so their word
+// data, history, and stats never mix. A level with no imported CSV yet has
+// no key in localStorage and simply reads back as empty.
+
+export function loadWords(levelId: string): Word[] {
   if (typeof window === "undefined") return [];
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw === null) {
-      // First launch: nothing has ever been saved, so seed with the
-      // built-in elementary-6th-grade word list instead of an empty state.
-      saveWords(DEFAULT_WORDS);
-      return DEFAULT_WORDS;
-    }
+    const raw = window.localStorage.getItem(wordsStorageKey(levelId));
+    if (raw === null) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as Word[]) : [];
   } catch {
@@ -30,16 +28,16 @@ export function loadWords(): Word[] {
   }
 }
 
-export function saveWords(words: Word[]): void {
+export function saveWords(levelId: string, words: Word[]): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+  window.localStorage.setItem(wordsStorageKey(levelId), JSON.stringify(words));
 }
 
-export function loadHistory(): AnswerRecord[] {
+export function loadHistory(levelId: string): AnswerRecord[] {
   if (typeof window === "undefined") return [];
 
   try {
-    const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+    const raw = window.localStorage.getItem(historyStorageKey(levelId));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as AnswerRecord[]) : [];
@@ -48,21 +46,21 @@ export function loadHistory(): AnswerRecord[] {
   }
 }
 
-export function appendHistoryRecord(record: AnswerRecord): void {
+export function appendHistoryRecord(levelId: string, record: AnswerRecord): void {
   if (typeof window === "undefined") return;
 
-  const history = loadHistory();
+  const history = loadHistory(levelId);
   history.push(record);
   const trimmed =
     history.length > MAX_HISTORY_LENGTH ? history.slice(history.length - MAX_HISTORY_LENGTH) : history;
-  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(trimmed));
+  window.localStorage.setItem(historyStorageKey(levelId), JSON.stringify(trimmed));
 }
 
-export function loadLearningStats(): LearningStats {
+export function loadLearningStats(levelId: string): LearningStats {
   if (typeof window === "undefined") return EMPTY_STATS;
 
   try {
-    const raw = window.localStorage.getItem(LEARNING_STATS_STORAGE_KEY);
+    const raw = window.localStorage.getItem(learningStatsStorageKey(levelId));
     if (!raw) return EMPTY_STATS;
     const parsed = JSON.parse(raw);
     return {
@@ -75,15 +73,15 @@ export function loadLearningStats(): LearningStats {
   }
 }
 
-export function saveLearningStats(stats: LearningStats): void {
+export function saveLearningStats(levelId: string, stats: LearningStats): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(LEARNING_STATS_STORAGE_KEY, JSON.stringify(stats));
+  window.localStorage.setItem(learningStatsStorageKey(levelId), JSON.stringify(stats));
 }
 
 // Only call when the answer was non-blank — blank submissions don't count as
 // "having written" toward the tree/daily totals (Phase2 spec).
-export function recordWrittenAnswer(): LearningStats {
-  const stats = loadLearningStats();
+export function recordWrittenAnswer(levelId: string): LearningStats {
+  const stats = loadLearningStats(levelId);
   const today = getLocalDateString();
   const updated: LearningStats = {
     totalAnswerCount: stats.totalAnswerCount + 1,
@@ -92,6 +90,6 @@ export function recordWrittenAnswer(): LearningStats {
       [today]: (stats.dailyRecords[today] ?? 0) + 1,
     },
   };
-  saveLearningStats(updated);
+  saveLearningStats(levelId, updated);
   return updated;
 }

@@ -1,28 +1,26 @@
-import { TREE_GROWTH_STAGES } from "./constants";
+import { TREE_GROWTH_THRESHOLDS } from "./constants";
 
-export function getTreeStage(totalAnswerCount: number): number {
+export function getTreeStage(masteredPercent: number): number {
   let stage = 0;
-  for (let i = 0; i < TREE_GROWTH_STAGES.length; i++) {
-    if (totalAnswerCount >= TREE_GROWTH_STAGES[i]) {
+  for (let i = 0; i < TREE_GROWTH_THRESHOLDS.length; i++) {
+    if (masteredPercent >= TREE_GROWTH_THRESHOLDS[i]) {
       stage = i;
     }
   }
   return stage;
 }
 
-export function getAnswersUntilNextStage(totalAnswerCount: number): number | null {
-  const stage = getTreeStage(totalAnswerCount);
-  if (stage >= TREE_GROWTH_STAGES.length - 1) return null;
-  return TREE_GROWTH_STAGES[stage + 1] - totalAnswerCount;
-}
+// Words still needed (mastered) before the tree advances to the next growth
+// stage. Null once the final stage is reached, or when there's no word bank
+// yet to measure a percentage against.
+export function getWordsUntilNextStage(masteredCount: number, totalCount: number): number | null {
+  if (totalCount === 0) return null;
 
-// Fraction (0-1) of progress from the current stage's threshold toward the
-// next one, for the tree's progress ring. 1 once the final stage is reached.
-export function getStageProgress(totalAnswerCount: number): number {
-  const stage = getTreeStage(totalAnswerCount);
-  if (stage >= TREE_GROWTH_STAGES.length - 1) return 1;
+  const percent = (masteredCount / totalCount) * 100;
+  const stage = getTreeStage(percent);
+  if (stage >= TREE_GROWTH_THRESHOLDS.length - 1) return null;
 
-  const current = TREE_GROWTH_STAGES[stage];
-  const next = TREE_GROWTH_STAGES[stage + 1];
-  return (totalAnswerCount - current) / (next - current);
+  const nextThreshold = TREE_GROWTH_THRESHOLDS[stage + 1];
+  const neededMastered = Math.ceil((nextThreshold / 100) * totalCount);
+  return Math.max(1, neededMastered - masteredCount);
 }

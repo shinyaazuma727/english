@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { loadHistory } from "@/lib/storage";
 import { calculateAverageElapsedMs, calculateBatchAccuracies, calculateOverallAccuracy } from "@/lib/stats";
 import { STATS_BATCH_SIZE } from "@/lib/constants";
@@ -9,11 +10,13 @@ import type { AnswerRecord } from "@/types/history";
 import styles from "./page.module.css";
 
 export default function StatsPage() {
+  const params = useParams<{ level: string }>();
+  const levelId = params.level;
   const [history, setHistory] = useState<AnswerRecord[] | null>(null);
 
   useEffect(() => {
-    setHistory(loadHistory());
-  }, []);
+    setHistory(loadHistory(levelId));
+  }, [levelId]);
 
   if (history === null) {
     return <main className={styles.page} />;
@@ -23,7 +26,7 @@ export default function StatsPage() {
     return (
       <main className={styles.page}>
         <div className={styles.header}>
-          <Link href="/" className={styles.back} aria-label="HOMEへ戻る">
+          <Link href={`/${levelId}`} className={styles.back} aria-label="HOMEへ戻る">
             ×
           </Link>
           <h1 className={styles.title}>統計</h1>
@@ -41,7 +44,7 @@ export default function StatsPage() {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link href="/" className={styles.back} aria-label="HOMEへ戻る">
+        <Link href={`/${levelId}`} className={styles.back} aria-label="HOMEへ戻る">
           ×
         </Link>
         <h1 className={styles.title}>統計</h1>

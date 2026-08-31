@@ -2,21 +2,24 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { loadWords } from "@/lib/storage";
 import type { Word } from "@/types/word";
 import styles from "./page.module.css";
 
 export default function MasteredListPage() {
+  const params = useParams<{ level: string }>();
+  const levelId = params.level;
   const [masteredWords, setMasteredWords] = useState<Word[] | null>(null);
 
   useEffect(() => {
-    setMasteredWords(loadWords().filter((w) => w.status === "mastered"));
-  }, []);
+    setMasteredWords(loadWords(levelId).filter((w) => w.status === "mastered"));
+  }, [levelId]);
 
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link href="/" className={styles.back} aria-label="HOMEへ戻る">
+        <Link href={`/${levelId}`} className={styles.back} aria-label="HOMEへ戻る">
           ×
         </Link>
         <h1 className={styles.title}>MASTERED LIST</h1>
