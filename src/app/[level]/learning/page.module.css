@@ -80,59 +80,13 @@
   line-height: 1.3;
 }
 
-.answerRow {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 10px;
-}
-
 .answerWrap {
-  width: var(--answer-line-width);
-  max-width: 100%;
+  width: 100%;
+  max-width: var(--answer-line-width);
   height: 48px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-}
-
-.micButton {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  margin-bottom: 4px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-accent-strong);
-  background: var(--color-surface-alt);
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.micButton:disabled {
-  opacity: 0.35;
-}
-
-.micButton:active {
-  transform: scale(0.92);
-}
-
-.micListening {
-  color: #ffffff;
-  background: var(--color-accent);
-  animation: micPulse 1.2s ease-in-out infinite;
-}
-
-@keyframes micPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 45%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-accent) 0%, transparent);
-  }
 }
 
 .answerInput {
@@ -165,6 +119,14 @@
   transition: border-bottom-color 0.2s ease;
 }
 
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  max-width: 100%;
+}
+
 .checkButton {
   width: var(--check-button-size);
   height: var(--check-button-size);
@@ -177,6 +139,44 @@
   justify-content: center;
   flex-shrink: 0;
   box-shadow: var(--shadow-lg);
+}
+
+.micButton {
+  width: var(--mic-button-size);
+  height: var(--mic-button-size);
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-strong);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.micButton:disabled {
+  opacity: 0.35;
+}
+
+.micButton:active {
+  transform: scale(0.92);
+}
+
+.micListening {
+  color: #ffffff;
+  background: var(--color-accent);
+  animation: micPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-accent) 0%, transparent);
+  }
 }
 
 .checkButton:disabled {

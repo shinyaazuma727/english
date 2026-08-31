@@ -209,73 +209,73 @@ export default function LearningPage() {
         </div>
         <div className={styles.japanese}>{currentWord?.japanese ?? ""}</div>
 
-        <div className={styles.answerRow}>
-          <div className={styles.answerWrap}>
-            <input
-              ref={inputRef}
-              className={`${styles.answerInput} ${
-                phase === "result" ? (resultCorrect ? styles.correctLine : styles.incorrectLine) : ""
-              }`}
-              type="text"
-              value={inputValue}
-              onChange={(event) => {
-                const value = event.target.value;
-                setInputValue(value);
-                inputValueRef.current = value;
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") handleSubmit();
-              }}
-              disabled={phase !== "answering"}
-              autoCapitalize="off"
-              autoCorrect="off"
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </div>
-
-          {micSupported && (
-            <button
-              type="button"
-              className={`${styles.micButton} ${isListening ? styles.micListening : ""}`}
-              onClick={handleMicClick}
-              disabled={phase !== "answering"}
-              aria-label={isListening ? "音声を聞き取り中" : "音声で答える"}
-            >
-              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                <path
-                  d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          )}
+        <div className={styles.answerWrap}>
+          <input
+            ref={inputRef}
+            className={`${styles.answerInput} ${
+              phase === "result" ? (resultCorrect ? styles.correctLine : styles.incorrectLine) : ""
+            }`}
+            type="text"
+            value={inputValue}
+            onChange={(event) => {
+              const value = event.target.value;
+              setInputValue(value);
+              inputValueRef.current = value;
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleSubmit();
+            }}
+            disabled={phase !== "answering"}
+            autoCapitalize="off"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck={false}
+          />
         </div>
       </div>
 
-      <button
-        type="button"
-        className={styles.checkButton}
-        onClick={handleSubmit}
-        disabled={phase !== "answering"}
-        aria-label="回答する"
-      >
-        <span key={answerCount} className={styles.checkIcon}>
-          ✓
-        </span>
-      </button>
+      <div className={styles.actionRow}>
+        {micSupported && (
+          <button
+            type="button"
+            className={`${styles.micButton} ${isListening ? styles.micListening : ""}`}
+            onClick={handleMicClick}
+            disabled={phase !== "answering"}
+            aria-label={isListening ? "音声を聞き取り中" : "音声で答える"}
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path
+                d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+
+        <button
+          type="button"
+          className={styles.checkButton}
+          onClick={handleSubmit}
+          disabled={phase !== "answering"}
+          aria-label="回答する"
+        >
+          <span key={answerCount} className={styles.checkIcon}>
+            ✓
+          </span>
+        </button>
+      </div>
 
       <div
         className={`${styles.resultArea} ${phase === "result" ? styles.visible : ""}`}
