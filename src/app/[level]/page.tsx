@@ -179,6 +179,22 @@ export default function LevelHomePage() {
           </svg>
           <span>統計</span>
         </Link>
+
+        <Link href="/guide" className={styles.secondaryButton}>
+          <svg className={styles.secondaryIcon} viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path
+              d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none" />
+          </svg>
+          <span>使い方の手引き</span>
+        </Link>
       </div>
 
       {words !== null && wordCount === 0 && (

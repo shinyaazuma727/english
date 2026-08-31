@@ -67,3 +67,11 @@
 .levelButton:active {
   transform: scale(0.97);
 }
+
+.guideLink {
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+}

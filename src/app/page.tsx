@@ -22,6 +22,10 @@ export default function LevelPickerPage() {
           </Link>
         ))}
       </div>
+
+      <Link href="/guide" className={styles.guideLink}>
+        使い方の手引き
+      </Link>
     </main>
   );
 }
